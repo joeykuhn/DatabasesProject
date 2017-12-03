@@ -1,7 +1,7 @@
 import sqlite3 as sql
 from flask import Flask, request
 from flask import render_template
-
+from collections import OrderedDict
 
 app = Flask(__name__)
 
@@ -12,40 +12,41 @@ def home():
 
 @app.route('/insert/<itype>')
 def insert(itype):
+    content = OrderedDict()
     if itype == 'part':
-        content = {'a_date':'Arrival Date',
-                   'name':'Name',
-                   'part_id':'Part ID',
-                   'serial':'Serial Number',
-                   'price':'Price',
-                   'mname': 'Manufacturer\'s Name'}
+        content['a_date'] = 'Arrival Date'
+        content['name'] = 'Name'
+        content['part_id'] = 'Part ID'
+        content['serial'] = 'Serial Number'
+        content['price']='Price'
+        content['mname'] =  'Manufacturer\'s Name'
         url='add_part'
     elif itype == 'man':
-        content = {'name': 'Name',
-                   'address': 'Address'}
+        content['name'] =  'Name'
+        content['address'] =  'Address'
         url = 'add_man'
     elif itype == 'order':
-        content = {'pay_info':'Payment Information',
-                   'order_ID':'Order ID',
-                   'date_ordered':'Date Ordered',
-                   'total_price':'Total Price'}
+        content['pay_info'] = 'Payment Information'
+        content['order_ID'] = 'Order ID'
+        content['date_ordered'] = 'Date Ordered'
+        content['total_price'] = 'Total Price'
         url = 'add_order'
     elif itype == 'cust':
-        content = {'fname': 'First Name',
-                   'lname': 'Last Name',
-                   'email': 'Email',
-                   'cust_id': 'Customer ID',
-                   'number': 'Phone Number',
-                   'stadd': 'Street Address',
-                   'zip': 'Zip Code',
-                   'state': 'State'}
+        content['fname'] = 'First Name'
+        content['lname'] = 'Last Name'
+        content['email']= 'Email'
+        content['cust_id'] = 'Customer ID'
+        content['number'] = 'Phone Number'
+        content['stadd']= 'Street Address'
+        content['zip']= 'Zip Code'
+        content['state']= 'State'
         url = 'add_cust'
     elif itype == 'op':
-        content = {'part_id': 'Part ID',
-                   'quantity': 'Quantity',
-                   'discount': 'Discount',
-                   'receipt_num': 'Receipt Number',
-                   'retail_price': 'Retail Price'}
+        content['part_id']= 'Part ID'
+        content['quantity']= 'Quantity'
+        content['discount']= 'Discount'
+        content['receipt_num']= 'Receipt Number'
+        content['retail_price']= 'Retail Price'
         url = 'add_op'
     return render_template('insert.html', content=content, url=url)
 
@@ -172,14 +173,71 @@ def add_op():
             return render_template("result.html", msg = msg)
             con.close()
 
-@app.route('/list')
-def list():
-    con = sql.connect("test3.db")
-    con.row_factory = sql.Row
-    cur = con.cursor()
-    cur.execute("SELECT * FROM part")
 
-    rows = cur.fetchall()
-    return render_template("list.html", rows = rows)
+@app.route('/list/<itype>')
+@app.route('/list')
+def list(itype='null'):
+    if itype == 'null':
+        con = sql.connect("test3.db")
+        con.row_factory = sql.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM part")
+        rows = cur.fetchall()
+        names = [description[0] for description in cur.description]
+        itype = 'part'
+    elif itype == 'part' or itype == 'customer' or itype == 'manufacturer' or itype == 'order' or itype == 'ordered_part':
+        con = sql.connect("test3.db")
+        con.row_factory = sql.Row
+        cur = con.cursor()
+        com = "SELECT * FROM " + itype
+        cur.execute(com)
+        names = [description[0] for description in cur.description]
+        rows = cur.fetchall()
+        print(type(rows[0]))
+        print(names)
+    else:
+        return render_template('index.html')
+    return render_template("list.html", rows = rows, names = names, tname=itype)
+
+
+@app.route('/display/<itype>/<ident1>/<ident2>')
+@app.route('/display/<itype>/<ident1>')
+@app.route('/display')
+def display(itype,ident1='Anon',ident2='Anon'):
+    print(itype, ident1, ident2)
+    if itype == 'Anon':
+        return render_template('index.html')
+    primk = {'part': 'part_id',
+             'manufacturer': 'name',
+             'customer': 'cust_id',
+             'order': 'order_id'}
+
+    con = sql.connect("test3.db")
+    cur = con.cursor()
+    if itype == 'op':
+        com = 'SELECT * FROM ordered_part WHERE receipt_num=' + ident1 + ' AND order_id=' + ident2
+        cur.execute(com)
+        row = cur.fetchone()
+        names = [description[0] for description in cur.description]
+        return render_template('display.html', row = row, names = names)
+    com = 'SELECT * FROM ' + itype + ' WHERE ' + primk[itype] + '= \'' + ident1 + '\''
+    print(com)
+    cur.execute(com)
+    row = cur.fetchone()
+    names = [description[0] for description in cur.description]
+    return render_template('display.html', row=row, names=names)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

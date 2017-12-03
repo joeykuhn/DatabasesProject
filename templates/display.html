@@ -1,0 +1,20 @@
+<!doctype html> 
+
+<html>
+  <body>
+    <table border=2>
+      <thead>
+        <tr>
+          {% for col in names %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tr>
+        {% for i in row %}
+          <td>{{ i }}</td>
+            {% endfor %}
+      </tr>
+    </table>
+  <body>
+</html>

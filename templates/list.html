@@ -1,28 +1,31 @@
 <!doctype html>
 <html>
-   <body>
-   
-      <table border = 1>
-         <thead>
-            <td>Arrival Date</td>
-	    <td>Name</td>
-            <td>Part ID</td>
-            <td>Serial Number</td>
-	    <td>Price</td>
-         </thead>
+  <body>
+    <table border = 1>
+      <thead>
+        <tr>
+          {% for col in names %}
+	    <td>{{ col }}</td> 
+	  {% endfor %}
+       </tr>
+      </thead>
          
-         {% for row in rows %}
-            <tr>
-               <td>{{row["a_date"]}}</td>
-               <td>{{row["name"]}}</td>
-               <td> {{ row["part_id"]}}</td>
-               <td>{{row['serial']}}</td>
-	       <td>{{ row['price'] }}</td>	       
+      {% for row in rows %}
+        <tr>
+	  {% for i in row %}
+            {% if row[0] == i %}
+              {% if names[1] == 'receipt_num' %}
+	      <td><a href="{{ url_for('display',itype=tname, ident1=row[0], ident2=row[1]) }}" >{{ i }}</a> </td>
+	      {% else %}
+	      <td><a href="{{ url_for('display',itype=tname, ident1=row[0]) }}">{{ i }}</a></td>
+	      {% endif %}      
+	    {% else %}
+	    <td>{{ i }}</td>
+	    {% endif %}
+          {% endfor %}
             </tr>
          {% endfor %}
-      </table>
-      
-      <a href = "/">Go back to home page</a>
-      
-   </body>
+    </table>
+    <a href = "/">Go back to home page</a>
+  </body>
 </html>
