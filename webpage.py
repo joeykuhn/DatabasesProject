@@ -178,23 +178,15 @@ def add_op():
 @app.route('/list')
 def list(itype='null'):
     if itype == 'null':
-        con = sql.connect("test3.db")
-        con.row_factory = sql.Row
-        cur = con.cursor()
-        cur.execute("SELECT * FROM part")
-        rows = cur.fetchall()
-        names = [description[0] for description in cur.description]
-        itype = 'part'
+        return render_template('index.html')
     elif itype == 'part' or itype == 'customer' or itype == 'manufacturer' or itype == 'order' or itype == 'ordered_part':
         con = sql.connect("test3.db")
         con.row_factory = sql.Row
         cur = con.cursor()
-        com = "SELECT * FROM " + itype
+        com = "SELECT * FROM '" + itype + "'"
         cur.execute(com)
         names = [description[0] for description in cur.description]
         rows = cur.fetchall()
-        print(type(rows[0]))
-        print(names)
     else:
         return render_template('index.html')
     return render_template("list.html", rows = rows, names = names, tname=itype)
@@ -219,25 +211,41 @@ def display(itype,ident1='Anon',ident2='Anon'):
         cur.execute(com)
         row = cur.fetchone()
         names = [description[0] for description in cur.description]
-        return render_template('display.html', row = row, names = names)
+        tname = itype
+        return render_template('display.html', row = row, names = names, tname=tname)
     com = 'SELECT * FROM ' + itype + ' WHERE ' + primk[itype] + '= \'' + ident1 + '\''
     print(com)
     cur.execute(com)
     row = cur.fetchone()
     names = [description[0] for description in cur.description]
-    return render_template('display.html', row=row, names=names)
+    tname = itype
+    return render_template('display.html', row=row, names=names, tname=tname)
 
 
+@app.route('/delete/<itype>/<ident>', methods = ["GET","POST"])
+def delete(itype, ident):
+    try:
+        primk = {'part': 'part_id',
+                 'manufacturer': 'name',
+                 'customer': 'cust_id',
+                 'order': 'order_id'}        
+        with sql.connect("test3.db") as con:
+            cur = con.cursor()
+            if itype == "part":
+                cur.execute("DELETE FROM part WHERE part_id = ?", (ident,))
+            elif itype == "manufacturer":
+                cur.execute("DELETE FROM manufacturer WHERE name = ?", (ident,))
+            elif itype == "order":
+                cur.execute("DELETE FROM order WHERE order_id = ?", (ident,))
+            elif itype == "customer":
+                cur.execute("DELETE FROM customer WHERE cust_ID = ?", (ident,))
+    
+            con.commit()
+            msg = "Deleted successfully"
 
-
-
-
-
-
-
-
-
-
-
-
+    except:
+        msg="something went wrong with the deletion"
+        con.rollback()
+    finally:
+        return render_template("result.html", msg=msg)
 
