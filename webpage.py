@@ -1,7 +1,6 @@
 import sqlite3 as sql
 from flask import Flask, request
 from flask import render_template
-from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -25,6 +24,29 @@ def insert(itype):
         content = {'name': 'Name',
                    'address': 'Address'}
         url = 'add_man'
+    elif itype == 'order':
+        content = {'pay_info':'Payment Information',
+                   'order_ID':'Order ID',
+                   'date_ordered':'Date Ordered',
+                   'total_price':'Total Price'}
+        url = 'add_order'
+    elif itype == 'cust':
+        content = {'fname': 'First Name',
+                   'lname': 'Last Name',
+                   'email': 'Email',
+                   'cust_id': 'Customer ID',
+                   'number': 'Phone Number',
+                   'stadd': 'Street Address',
+                   'zip': 'Zip Code',
+                   'state': 'State'}
+        url = 'add_cust'
+    elif itype == 'op':
+        content = {'part_id': 'Part ID',
+                   'quantity': 'Quantity',
+                   'discount': 'Discount',
+                   'receipt_num': 'Receipt Number',
+                   'retail_price': 'Retail Price'}
+        url = 'add_op'
     return render_template('insert.html', content=content, url=url)
 
 
@@ -45,7 +67,6 @@ def add_part():
                 cur.execute("INSERT INTO part (a_date,name,part_id,serial,price) VALUES (?,?,?,?,?)",(a_date,name,part_id,serial,price))
                 cur.execute("INSERT INTO made (name, part_id) VALUES (?,?)", (mname, part_id))
                 con.commit()
-                print("PLLLLLLLLLLLLLLEEEEEEEEEEEEAAAAAAAAAAASSSSSSSSSSEEEEEEEEEEE")
                 msg = "Added part successfully"
         except:
             con.rollback()
@@ -68,6 +89,81 @@ def add_man():
                 cur.execute("INSERT INTO manufacturer (name, address) VALUES (?,?)",(name, address))
                 con.commit()
                 msg = "Added manufacturer successfully"
+        except:
+            con.rollback()
+            msg = "error in insert operation"
+
+        finally:
+            return render_template("result.html", msg = msg)
+            con.close()
+
+
+@app.route('/addcust', methods=["POST", "GET"])
+def add_cust():
+    msg = ""
+    if request.method == 'POST':
+        try:
+            fname = request.form["fname"]
+            lname = request.form["lname"]
+            email = request.form["email"]
+            cust_id = request.form["cust_id"]
+            number = request.form["number"]
+            stadd = request.form["stadd"]
+            _zip_ = request.form["zip"]
+            state = request.form["state"]
+
+            with sql.connect("test3.db") as con:
+                cur = con.cursor()
+                cur.execute("INSERT INTO customer (fname, lname, email, cust_id, number, stadd, zip, state) VALUES (?,?,?,?,?,?,?,?)",(fname, lname, email, cust_id, number, stadd, _zip_, state))
+                con.commit()
+                msg = "Added customer successfully"
+        except:
+            con.rollback()
+            msg = "error in insert operation"
+
+        finally:
+            return render_template("result.html", msg = msg)
+            con.close()
+
+
+@app.route('/addorder', methods=["POST", "GET"])                                                                                                                                                                
+def add_order():
+    msg = ""                                                                                                                                                                                                       
+    if request.method == 'POST':                                                                                                                                                                                   
+        try:                                                                                                                                                                                                       
+            pay_info = request.form["pay_info"] 
+            total_price = request.form["total_price"]
+            order_id = request.form["order_id"]
+            date_ordered = request.form["date_ordered"]
+                                                                                                                                                                                                                   
+            with sql.connect("test3.db") as con:                                                                                                                                                                   
+                cur = con.cursor()                                                                                                                                                                                 
+                cur.execute("INSERT INTO order (pay_info, total_price, order_id, date_ordered) VALUES (?,?,?,?)",(pay_info, total_price, order_id, date_ordered)) 
+                con.commit()                                                                                                                                                                                       
+                msg = "Added order successfully"                                                                         
+        except:                                                                                                                                                                                                    
+            con.rollback()                                                                                                                                                                                         
+            msg = "error in insert operation"                                                                                                                                                                      
+                                                                                                                                                                                                                   
+        finally:                                                                                                                                                                                                   
+            return render_template("result.html", msg = msg)                                                                                                                                                       
+            con.close()
+
+@app.route('/addop', methods=["POST", "GET"])
+def add_op():
+    msg = ""
+    if request.method == 'POST':
+        try:
+            part_id = request.form["part_id"]
+            quantity = request.form["quantity"]
+            discount = request.form["discount"]
+            receipt_num = request.form["receipt_num"]
+            retail_price = request.form["retail_price"]
+            with sql.connect("test3.db") as con:
+                cur = con.cursor()
+                cur.execute("INSERT INTO ordered_part (part_id, quantity, discount, receipt_num, retail_price) VALUES (?,?,?,?,?)",(part_id, quantity, discount, receipt_num, retail_price))
+                con.commit()
+                msg = "Added ordered part successfully"
         except:
             con.rollback()
             msg = "error in insert operation"
