@@ -1,22 +1,88 @@
 <html>
-   <body>
-         
-	   <form action = "{{ url_for(url) }}" method = "POST">
-           <h3>Insert Information</h3>
+	<head>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='manu.css') }}" >
+		<title>{{url}}</title>
+	</head>
+	<body>
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/insert/part">New Part</a></li>
+			<li><a href="/insert/man">New Manufacturer</a></li>
+			<li><a href="/insert/order">New Order</a></li>
+			<li><a href="/insert/cust">New Customer</a></li>
+			<li><a href="/list/part">List Parts</a></li>
+			<li><a href="/list/manufacturer">List Manufacturer</a></li>
+			<li><a href="/list/order">List Orders</a></li>
+			<li><a href="/list/customer">List Customers</a></li>
+		</ul>
+		<div style="margin-left:25%;padding:1px 16px;height:1000px;">
+			<br><br><br>
+			<form action="{{ url_for(url) }}" method="POST">
+				{% for key, value in content.items() %} {% if key != 'a_date' %} {{ value }}
+				<br>
+				<input type="text" name={{ key }} required/>
+				<br> {% else %} {{ value }}
+				<br>
+				<input type="date" name={{ key }} required/>
+				<br> {% endif %} {% endfor %}
+				<br>
+				<input value="Submit" id="subm" type="submit"/>
+			</form>
+		</div>
+	</body>
+	<style>
+		div {
+			border-radius: 5px;
+			padding: 20px;
+			background-color: #ffffffea;
+		}
 
-	   {% for key, value in content.items() %}
-	        {% if key != 'a_date' %}    
-	   	    {{ value }}<br>
-		    <input type="text" name = {{ key }} /><br>
-	        {% else %}
-		    {{ value }}<br>
-		    <input type="date" name = {{ key }} /><br>
-		{% endif %}
-		    
-           {% endfor %}
+		input[type=text] {
+			width: 20vw;
+			padding: 12px 20px;
+			margin: 8px 0;
+			box-sizing: border-box;
+			border: 3px solid #ccc;
+			-webkit-transition: 0.5s;
+			transition: 0.5s;
+			outline: none;
+		}
 
-	   <input type = "submit" value = "submit" /><br>
-         </form>
+		input[type=text]:focus {
+			border: 3px solid #555;
+		}
 
-   </body>
+		body {
+			margin: 0;
+		}
+
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			width: 20vw;
+			background-color: #f1f1f175;
+			position: fixed;
+			height: 100%;
+			overflow: auto;
+		}
+
+		li a {
+			display: block;
+			color: #000;
+			padding: 8px 16px;
+			text-decoration: none;
+		}
+
+		li a:active {
+			background-color: rgb(11, 204, 27);
+			color: white;
+		}
+
+		li a:hover:not(.active) {
+			background-color: #555;
+			color: white;
+		}
+		</style>
+		
 </html>

@@ -5,27 +5,38 @@
       <thead>
         <tr>
           {% for col in names %}
-	    <td>{{ col }}</td> 
-	  {% endfor %}
-       </tr>
+	          <td>{{ col }}</td> 
+	        {% endfor %}
+        </tr>
       </thead>
          
       {% for row in rows %}
         <tr>
-	  {% for i in row %}
+	        {% for i in row %}
             {% if row[0] == i %}
               {% if names[1] == 'receipt_num' %}
-	      <td><a href="{{ url_for('display',itype=tname, ident1=row[0], ident2=row[1]) }}" >{{ i }}</a> </td>
-	      {% else %}
-	      <td><a href="{{ url_for('display',itype=tname, ident1=row[0]) }}">{{ i }}</a></td>
-	      {% endif %}      
-	    {% else %}
-	    <td>{{ i }}</td>
-	    {% endif %}
+	              <td><a href="{{ url_for('display',itype=tname, ident1=row[0], ident2=row[1]) }}" >{{ i }}</a> </td>
+	            {% else %}
+	              <td><a href="{{ url_for('display',itype=tname, ident1=row[0]) }}">{{ i }}</a></td>
+	            {% endif %}      
+            {% else %}
+	           <td>{{ i }}</td>
+	          {% endif %}
           {% endfor %}
-            </tr>
-         {% endfor %}
+        </tr>
+      {% endfor %}
     </table>
     <a href = "/">Go back to home page</a>
   </body>
+  <script> 
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+    }
+    tr:nth-child(even) {background-color: #f2f2f2;}
+  </script>
 </html>
