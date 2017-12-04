@@ -42,11 +42,6 @@ li a {
   text-decoration: none;
 }
 
-li a.active {
-  background-color: black;
-  color: white;
-}
-
 li a:hover {
   background-color: #555;
   color: white;
