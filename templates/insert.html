@@ -2,6 +2,7 @@
 	<head>
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/insert.css') }}">
 		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/navbar.css') }}">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/button.css') }}">
 		<title>{{url}}</title>
 	</head>
 	<body>
@@ -28,7 +29,7 @@
 				<input type="date" name={{ key }} required/>
 				<br> {% endif %} {% endfor %}
 				<br>
-				<input value="Submit" type="submit"/>
+				<input class="button" value="Submit" type="submit"/>
 			</form>
 		</div>
 	</body>		
