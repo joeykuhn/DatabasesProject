@@ -19,30 +19,3 @@ input[type=text] {
 input[type=text]:focus {
   border: 3px solid #555;
 }
-
-body {
-  margin: 0;
-}
-
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 20vw;
-  background-color: #f1f1f175;
-  position: fixed;
-  height: 100%;
-  overflow: auto;
-}
-
-li a {
-  display: block;
-  color: #000;
-  padding: 8px 16px;
-  text-decoration: none;
-}
-
-li a:hover {
-  background-color: #555;
-  color: white;
-}
