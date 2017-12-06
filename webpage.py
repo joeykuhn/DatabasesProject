@@ -15,6 +15,8 @@ def home():
 def insert(itype):
     rows = ""
     content = OrderedDict()
+    # content is an ordered dict so that when the elements are put into the webpage
+    # their order is consistent.
     if itype == 'part':
         content['a_date'] = 'Arrival Date'
         content['name'] = 'Name'
@@ -22,6 +24,7 @@ def insert(itype):
         content['serial'] = 'Serial Number'
         content['price']='Price'
         content['mname'] =  'Manufacturer\'s Name'
+        # We populate a dropdown with manufacturers so we have to SELECT them for the database
         with sql.connect("test3.db") as con:
             cur = con.cursor()
             con.row_factory = sql.Row
@@ -71,6 +74,7 @@ def add_part():
             mname = request.form["mname"]
             vals = ("part_id", part_id)
             check = enforce("part", vals)
+            # Checking to see if there is already an entity with the same primary key
             if check["error"]:
                 return render_template('index.html',msg=check["msg"])
 
@@ -91,6 +95,7 @@ def add_man():
         try:
             name = request.form["name"]
             address = request.form["address"]
+            # Checking that a manufacturer with the same name does not exist already
             check = enforce("manufacturer", ("name", name))
             if check["error"]:
                 return render_template("index.html", msg=check["msg"])
@@ -99,10 +104,8 @@ def add_man():
                 cur = con.cursor()
                 cur.execute("INSERT INTO manufacturer (name, address) VALUES (?,?)",(name, address))
                 con.commit()
-                msg = "Added manufacturer successfully"
         except:
             con.rollback()
-            msg = "error in insert operation"
 
         finally:
             return render_template("index.html", msg = check["msg"])
@@ -130,10 +133,8 @@ def add_cust():
                 cur = con.cursor()
                 cur.execute("INSERT INTO customer (fname, lname, email, cust_id, number, stadd, zip, state) VALUES (?,?,?,?,?,?,?,?)",(fname, lname, email, cust_id, number, stadd, _zip_, state))
                 con.commit()
-                msg = "Added customer successfully"
         except:
             con.rollback()
-            msg = "error in insert operation"
 
         finally:
             return render_template("index.html", msg = check["msg"])
@@ -171,9 +172,10 @@ def add_op():
             part_id = request.form["part_id"]
             quantity = request.form["quantity"]
             discount = request.form["discount"]
-            order_ID = request.form["order_id"]
+            order_id = request.form["order_id"]
             retail_price = request.form["retail_price"]
-            check = enforce("ordered_part", (part_id, order_id))
+            vals = (part_id, order_id)
+            check = enforce("ordered_part", vals)
             if check["error"]:
                 return render_template("index.html", msg=check["msg"])
 
@@ -193,14 +195,18 @@ def add_op():
 @app.route('/list')
 def list(itype='null'):
     if itype == 'null':
+        # accounting for manually putting in url
         return render_template('index.html')
     elif itype == 'part' or itype == 'customer' or itype == 'manufacturer' or itype == 'order' or itype == 'ordered_part':
         con = sql.connect("test3.db")
         con.row_factory = sql.Row
         cur = con.cursor()
+        # select all rows from the itype given
         com = "SELECT * FROM '" + itype + "'"
         cur.execute(com)
+        # get all of the column names
         names = [description[0] for description in cur.description]
+        # rows is all of the rows returned from the select statement
         rows = cur.fetchall()
     else:
         return render_template('index.html')
@@ -212,7 +218,8 @@ def list(itype='null'):
 @app.route('/display')
 def display(itype,ident1='Anon',ident2='Anon'):
     if itype == 'Anon':
-        return render_template('index.html')
+        return render_template('index.html', msg="Enter a type to see a list")
+    # dict for all entries and their primary key as reference for commands
     primk = {'part': 'part_id',
              'manufacturer': 'name',
              'customer': 'cust_id',
@@ -220,10 +227,11 @@ def display(itype,ident1='Anon',ident2='Anon'):
 
     con = sql.connect("test3.db")
     cur = con.cursor()
-    if itype == 'op':
+    # accounting for ordered part having two primary keys
+    if itype == 'ordered_part':
         com = 'SELECT * FROM ordered_part WHERE part_id=' + ident1 + ' AND order_id=' + ident2
         cur.execute(com)
-        row = enumerate(cur.fetchone())
+        row = cur.fetchone()
         names = [description[0] for description in cur.description]
         tname = itype
         return render_template('display.html', row = row, names = names, tname=tname)
@@ -234,15 +242,12 @@ def display(itype,ident1='Anon',ident2='Anon'):
     return render_template('display.html', row=row, names=names, tname=tname)
 
 
-@app.route('/delete/<itype>/<ident>', methods = ["GET","POST"])
-def delete(itype, ident):
+@app.route('/delete/<itype>/<ident>/<ident2>', methods = ["GET","POST"])
+def delete(itype, ident, ident2=None):
     try:
-        primk = {'part': 'part_id',
-                 'manufacturer': 'name',
-                 'customer': 'cust_id',
-                 'order': 'order_id'}        
         with sql.connect("test3.db") as con:
             cur = con.cursor()
+            # sqlite does not like having variables in delete statements so we have a case for each table
             if itype == "part":
                 cur.execute("DELETE FROM part WHERE part_id = ?", (ident,))
             elif itype == "manufacturer":
@@ -251,7 +256,9 @@ def delete(itype, ident):
                 cur.execute("DELETE FROM order WHERE order_id = ?", (ident,))
             elif itype == "customer":
                 cur.execute("DELETE FROM customer WHERE cust_ID = ?", (ident,))
-    
+            elif itype == "ordered_part":
+                cur.execute("DELETE FROM ordered_part WHERE part_id = ? AND order_id = ?", (ident, ident2))
+
             con.commit()
             msg = "Deleted successfully"
 
@@ -278,6 +285,8 @@ def modify(itype):
     if request.method == "POST":
         with sql.connect("test3.db") as con:
             cur = con.cursor()
+            # for each possibility, we update the table with the values given to us by the user
+            # we do this by putting all of the non-pk columns into a list and looping over an update statement
             if itype == "ordered_part":
                 cols = ["quantity", "discount", "retail_price"]
                 vals = [request.form["part_id"], request.form["order_id"]]
@@ -318,11 +327,15 @@ def modify(itype):
 def enforce(itype, vals):
     with sql.connect("test3.db") as con:
         cur = con.cursor()
+        # have to account for two pk's in ordered_part
         if itype == 'ordered_part':
-            cur.execute('SELECT * FROM ordered_part WHERE part_id=' + vals[0] + "AND order_id=" + vals[1])
+            cur.execute('SELECT * FROM ordered_part WHERE part_id=? AND order_id=?', (vals[0], vals[1]))
             if cur.fetchone():
-                return {"msg": "Invalid: part_id= " + vals[0] + " and order_id=" + vals[1] + " already exists!",
+                return {"msg": "Invalid: ordered_part with part_id={} and order_id={} already exists!".format(vals[0], vals[1]), 
                         "error": True}
+            else:
+                return {"msg": "Successfully completed action.",
+                        "error": False}
         else:
             cur.execute("SELECT * FROM '{}' WHERE {}=?".format(itype, vals[0]), (vals[1],))
             if cur.fetchone() is not None:

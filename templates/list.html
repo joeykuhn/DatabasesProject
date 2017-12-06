@@ -45,7 +45,7 @@
           <tr>
             {% for i in row %}
               {% if row[0] == i %}
-                {% if names[1] == 'receipt_num' %}
+                {% if names[0] == 'part_id' and names[1] == 'order_id' %}
                   <td><a href="{{ url_for('display',itype=tname, ident1=row[0], ident2=row[1]) }}" >{{ i }}</a> </td>
                 {% else %}
                   <td><a href="{{ url_for('display',itype=tname, ident1=row[0]) }}">{{ i }}</a></td>

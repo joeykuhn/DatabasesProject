@@ -24,7 +24,7 @@
 			<br><br><br>
 			<form action="{{ url_for(url) }}" method="POST" onsubmit=showHide(); return false;>
 				{% for key, value in content.items() %} 
-				  {% if key not in ["a_date", "date", "mname"] %}
+				  {% if key not in ["a_date", "date_ordered", "mname"] %}
 				    {{ value }}
 						<br>
 						<input type="text" name={{ key }} placeholder={{ key }} required/>
