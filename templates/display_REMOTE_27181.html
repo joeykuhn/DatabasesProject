@@ -1,0 +1,41 @@
+<!doctype html> 
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/button.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/navbar.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/table.css') }}" />
+    <title>{{url}}</title>
+  </head>
+  <body>
+    <ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/insert/part">New Part</a></li>
+			<li><a href="/insert/man">New Manufacturer</a></li>
+			<li><a href="/insert/order">New Order</a></li>
+			<li><a href="/insert/cust">New Customer</a></li>
+			<li><a href="/list/part">List Parts</a></li>
+			<li><a href="/list/manufacturer">List Manufacturer</a></li>
+			<li><a href="/list/order">List Orders</a></li>
+			<li><a href="/list/customer">List Customers</a></li>
+		</ul>
+    <div id="tb" style="margin-left:25%;padding:1px 16px;height:100%;">
+      <table>
+        <thead>
+          <tr>
+            {% for col in names %}
+              <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tr>
+          {% for i in row %}
+            <td>{{ i }}</td>
+              {% endfor %}
+        </tr>
+      </table>
+      <form action="{{ url_for('delete', itype=tname, ident=row[0]) }}" method="post">
+        <input class="button" type="submit" value="Delete" />
+      </form>    
+    </div>  
+  <body>
+</html>

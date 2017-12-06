@@ -21,6 +21,11 @@ def insert(itype):
         content['serial'] = 'Serial Number'
         content['price']='Price'
         content['mname'] =  'Manufacturer\'s Name'
+        with sql.connect("test3.db") as con:
+            cur = con.cursor()
+            con.row_factory = sql.Row
+            cur.execute("SELECT * FROM manufacturer")
+            rows = cur.fetchall()
         url='add_part'
     elif itype == 'man':
         content['name'] =  'Name'
@@ -49,7 +54,7 @@ def insert(itype):
         content['discount']= 'Discount'
         content['retail_price']= 'Retail Price'
         url = 'add_op'
-    return render_template('insert.html', content=content, url=url)
+    return render_template('insert.html', content=content, url=url, rows=rows)
 
 
 @app.route('/addpart', methods=["POST", "GET"])

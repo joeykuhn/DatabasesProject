@@ -1,0 +1,30 @@
+<!doctype html> 
+
+<html>
+  <body>
+	  <form action="{{ url_for("modify", itype=tname) }}" method="post">
+      <table border=2>
+        <thead>
+          <tr>
+            {% for col in names %}
+            <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+          <tr>
+          {% for i in row %}
+	    {% if names[loop.index0] not in ["name", "order_id", "part_id", "cust_id"] %}
+	    <td><input type=text value={{ i }} name={{ names[loop.index0] }}></td>
+	    {% else %}
+	    <td>{{ i }}</td>
+	    {% endif %}
+          {% endfor %}
+          </tr>
+      </table>
+      <input type=submit value="Update">
+    </form>
+    <form action="{{ url_for('delete', itype=tname, ident=row[0]) }}" method="post">
+	    <input type="submit" value="Delete" />
+    </form>
+  <body>
+</html>

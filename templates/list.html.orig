@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/navbar.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/table.css') }}" />
+    <title>{{url}}</title>
+  </head>
+  <body>
+    <ul>
+			<li><a href="/" >Home</a></li>				
+			<li><a href="/insert/part">New Part</a></li>
+			<li><a href="/insert/man">New Manufacturer</a></li>
+			<li><a href="/insert/order">New Order</a></li>
+			<li><a href="/insert/cust">New Customer</a></li>
+			<li><a href="/list/part">List Parts</a></li>
+			<li><a href="/list/manufacturer">List Manufacturer</a></li>
+			<li><a href="/list/order">List Orders</a></li>
+			<li><a href="/list/customer">List Customers</a></li>
+		</ul>
+<<<<<<< HEAD
+    <div style="margin-left:25%; padding:1px 16px; height:100%;">
+	    <form action="{{ url_for('search', itype=tname) }}" method="POST">
+		    <select name="selection">
+			    {% for col in names %}
+			    <option value="{{ col }}">{{ col }}</option>
+			    {% endfor %}
+	            </select>
+		    <input type=text name="search" >
+		    <input type=submit value="Search">
+            </form>
+=======
+    <div id="tb" style="margin-left:25%; padding:1px 16px; height:100%;">
+>>>>>>> cb988992cd7557b173baa444989c20bbc1627ba6
+      <table>
+        <thead>
+          <tr>
+            {% for col in names %}
+              <th>{{ col }}</td> 
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            {% for i in row %}
+              {% if row[0] == i %}
+                {% if names[1] == 'receipt_num' %}
+                  <td><a href="{{ url_for('display',itype=tname, ident1=row[0], ident2=row[1]) }}" >{{ i }}</a> </td>
+                {% else %}
+                  <td><a href="{{ url_for('display',itype=tname, ident1=row[0]) }}">{{ i }}</a></td>
+                {% endif %}      
+              {% else %}
+                <td>{{ i }}</td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
