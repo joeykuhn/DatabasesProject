@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/navbar.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/table.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/button.css') }}" />
-    <title>{{url}}</title>
+    <title>Listing</title>
   </head>
   <body>
     <ul>
@@ -13,28 +13,30 @@
 			<li><a href="/insert/part">New Part</a></li>
 			<li><a href="/insert/man">New Manufacturer</a></li>
 			<li><a href="/insert/order">New Order</a></li>
+			<li><a href="/insert/op">New Ordered Part</a></li>
 			<li><a href="/insert/cust">New Customer</a></li>
 			<li><a href="/list/part">List Parts</a></li>
 			<li><a href="/list/manufacturer">List Manufacturer</a></li>
 			<li><a href="/list/order">List Orders</a></li>
+			<li><a href="/list/ordered_part">List Ordered Part</a></li>
 			<li><a href="/list/customer">List Customers</a></li>
 		</ul>
     <div style="margin-left:25%; padding:1px 16px; height:100%;">
-	    <div style="margin-top: 15px; margin-bottom: 15px; padding: 1px 16px;">
+	    <div class="searchBar" style="margin-top: 15px; margin-bottom: 15px; padding: 1px 16px;">
         <form action="{{ url_for('search', itype=tname) }}" method="POST">
           <select name="selection">
             {% for col in names %}
             <option value="{{ col }}">{{ col }}</option>
             {% endfor %}
           </select>
-          <input class="search" type=text name="search" placeholder="Search...">
+          <input class="searchBar" type=text name="search" placeholder="Search...">
         </form>
       </div>
       <table>
         <thead>
           <tr>
             {% for col in names %}
-              <td>{{ col }}</td> 
+              <th>{{ col }}</th> 
             {% endfor %}
           </tr>
         </thead>
