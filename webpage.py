@@ -268,7 +268,8 @@ def search(itype):
         with sql.connect("test3.db") as con:
             cur = con.cursor()
             con.row_factory = sql.Row
-            com = "SELECT * FROM '" + itype  + "' WHERE " + request.form["selection"] + "=" + request.form["search"]
+            com = "SELECT * FROM '" + itype  + "' WHERE " + request.form["selection"] + "='" + request.form["search"] + "'"
+            print(com)
             cur.execute(com)
             rows = cur.fetchall()
             names = [description[0] for description in cur.description]
