@@ -13,6 +13,7 @@ def home():
 
 @app.route('/insert/<itype>')
 def insert(itype):
+    rows = ""
     content = OrderedDict()
     if itype == 'part':
         content['a_date'] = 'Arrival Date'
