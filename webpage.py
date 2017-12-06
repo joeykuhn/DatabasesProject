@@ -227,11 +227,13 @@ def display(itype,ident1='Anon',ident2='Anon'):
         names = [description[0] for description in cur.description]
         tname = itype
         return render_template('display.html', row = row, names = names, tname=tname)
-    com = 'SELECT * FROM ' + itype + ' WHERE ' + primk[itype] + '= \'' + ident1 + '\''
-    cur.execute(com)
+    print(primk[itype])
+    print(ident1)
+    cur.execute("SELECT * FROM '{}' WHERE {}=?".format(itype, primk[itype]), (ident1,))
     row = cur.fetchone()
     names = [description[0] for description in cur.description]
     tname = itype
+    print (row)
     return render_template('display.html', row=row, names=names, tname=tname)
 
 
@@ -292,33 +294,33 @@ def modify(itype):
             elif itype == "part":
                 cols = ["a_date", "name", "serial", "price"]
                 vals = ["part_id", request.form["part_id"]]
-                check = enforce(itype, vals)
                 for i in cols:
-                    cur.execute("UPDATE '{}' SET {}='{}' WHERE part_id=?".format(itype, i, request.form[i]), (vals[1]))
-                return render_template("index.html", msg=check["msg"])
+                    cur.execute("UPDATE part SET {}='{}' WHERE part_id=?".format(i, request.form[i]), (vals[1],))
+                return render_template("index.html", msg="Successfully changed part!")
              
             elif itype == "manufacturer":
                 cols = ["address"]
                 vals = ["name", request.form["name"]]
-                check = enforce(itype, vals)
                 for i in cols:
-                    cur.execute("UPDATE '{}' SET {}={} WHERE name=?".format(itype, i, request.form[i]), (vals[1]))
-                return render_template("index.html", msg=check["msg"])
+                    cur.execute("UPDATE manufacturer SET {}=? WHERE name=?".format(i), (request.form[i], vals[1]))
+                return render_template("index.html", msg="Successfully changed manufacturer!")
           
             elif itype == "order":
                 cols = ["pay_info", "total_price", "date_ordered"]
-                vals = ["order_id", request.form["order_id"]]
-                check = enforce(itype, vals)
                 for i in cols:
-                    cur.execute("UPDATE '{}' SET {}={} WHERE order_id=?".format(itype, i, request.form[i]), (vals[1]))
-                return render_template("index.html", msg=check["msg"])          
+                    print(i)
+                    print(request.form[i])
+                    print(request.form["order_id"])
+                    cur.execute("UPDATE 'order' SET {}='{}' WHERE order_id=?".format(i, request.form[i]), (request.form["order_id"],))
+                    print("OHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                return render_template("index.html", msg="Successfully changed order!")          
 
             elif itype == "customer":
                 cols = ["fname", "lname", "email", "n/umber", "stadd", "zip", "state"]
                 vals = ["cust_id", request.form["cust_id"]]
                 check = enforce(itype, vals)
                 for i in cols:
-                    cur.execute("UPDATE '{}' SET {}={} WHERE cust_id=?".format(itype, i, request.form[i]), (vals[1]))
+                    cur.execute("UPDATE '{}' SET {}={} WHERE cust_id=?".format(itype, i, request.form[i]), (vals[1],))
                 return render_template("index.html", msg=check["msg"])
 
 
