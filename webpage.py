@@ -295,7 +295,7 @@ def modify(itype):
                 cols = ["a_date", "name", "serial", "price"]
                 vals = ["part_id", request.form["part_id"]]
                 for i in cols:
-                    cur.execute("UPDATE part SET {}='{}' WHERE part_id=?".format(i, request.form[i]), (vals[1],))
+                    cur.execute("UPDATE part SET {}=? WHERE part_id=?".format(i), (request.form[i], vals[1]))
                 return render_template("index.html", msg="Successfully changed part!")
              
             elif itype == "manufacturer":
@@ -308,19 +308,14 @@ def modify(itype):
             elif itype == "order":
                 cols = ["pay_info", "total_price", "date_ordered"]
                 for i in cols:
-                    print(i)
-                    print(request.form[i])
-                    print(request.form["order_id"])
-                    cur.execute("UPDATE 'order' SET {}='{}' WHERE order_id=?".format(i, request.form[i]), (request.form["order_id"],))
-                    print("OHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                    cur.execute("UPDATE 'order' SET {}=? WHERE order_id=?".format(i), (request.form[i], request.form["order_id"]))
                 return render_template("index.html", msg="Successfully changed order!")          
 
             elif itype == "customer":
                 cols = ["fname", "lname", "email", "n/umber", "stadd", "zip", "state"]
                 vals = ["cust_id", request.form["cust_id"]]
-                check = enforce(itype, vals)
                 for i in cols:
-                    cur.execute("UPDATE '{}' SET {}={} WHERE cust_id=?".format(itype, i, request.form[i]), (vals[1],))
+                    cur.execute("UPDATE customer SET {}=? WHERE cust_id=?".format(i), (request.form[i], vals[1]))
                 return render_template("index.html", msg=check["msg"])
 
 
