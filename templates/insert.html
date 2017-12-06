@@ -19,7 +19,7 @@
 		<div style="margin-left:25%;padding:1px 16px;height:100%;">
 			<h3> Please insert the correct information, do not leave any fields blank. </h3>
 			<br><br><br>
-			<form action="{{ url_for(url) }}" method="POST">
+			<form action="{{ url_for(url) }}" method="POST" onsubmit="showHide(); return false;">
 				{% for key, value in content.items() %} {% if key != 'a_date' and key != 'date_ordered' %} {{ value }}
 				<br>
 				<input type="text" name={{ key }} placeholder={{ key }} required/>
@@ -28,7 +28,7 @@
 				<input type="date" name={{ key }} required/>
 				<br> {% endif %} {% endfor %}
 				<br>
-				<input value="Submit" type="submit"/>
+				<input class="button" value="Submit" type="submit"/>
 			</form>
 		</div>
 	</body>		
