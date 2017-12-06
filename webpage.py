@@ -227,13 +227,10 @@ def display(itype,ident1='Anon',ident2='Anon'):
         names = [description[0] for description in cur.description]
         tname = itype
         return render_template('display.html', row = row, names = names, tname=tname)
-    print(primk[itype])
-    print(ident1)
     cur.execute("SELECT * FROM '{}' WHERE {}=?".format(itype, primk[itype]), (ident1,))
     row = cur.fetchone()
     names = [description[0] for description in cur.description]
     tname = itype
-    print (row)
     return render_template('display.html', row=row, names=names, tname=tname)
 
 
@@ -271,7 +268,6 @@ def search(itype):
             cur = con.cursor()
             con.row_factory = sql.Row
             com = "SELECT * FROM '" + itype  + "' WHERE " + request.form["selection"] + "='" + request.form["search"] + "'"
-            print(com)
             cur.execute(com)
             rows = cur.fetchall()
             names = [description[0] for description in cur.description]
