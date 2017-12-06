@@ -5,8 +5,9 @@ div {
 
 #tb a, #tb a:visited {
   text-decoration: none;
-  color: blue;
+  color: rgb(25, 25, 90);
 }
+
 table {
   font-family: MuseoSans;
   border-collapse: collapse;

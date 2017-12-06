@@ -5,19 +5,21 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/button.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/navbar.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/table.css') }}" />
-    <title>{{url}}</title>
+    <title>Display results</title>
   </head>
   <body>
 	
     <ul>
-			<li><a href="/">Home</a></li>
+			<li><a href="/" >Home</a></li>				
 			<li><a href="/insert/part">New Part</a></li>
 			<li><a href="/insert/man">New Manufacturer</a></li>
 			<li><a href="/insert/order">New Order</a></li>
+			<li><a href="/insert/op">New Ordered Part</a></li>
 			<li><a href="/insert/cust">New Customer</a></li>
 			<li><a href="/list/part">List Parts</a></li>
 			<li><a href="/list/manufacturer">List Manufacturer</a></li>
 			<li><a href="/list/order">List Orders</a></li>
+			<li><a href="/list/ordered_part">List Ordered Part</a></li>
 			<li><a href="/list/customer">List Customers</a></li>
 		</ul>
     <div id="tb" style="margin-left:25%;padding:1px 16px;height:100%;">
@@ -32,15 +34,17 @@
         </thead>
           <tr>
           {% for i in row %}
-	    {% if names[loop.index0] not in ["name", "order_id", "part_id", "cust_id"] or (names[loop.index0] in ["name"] and tname != "manufacturer") %}
-	    <td><input type=text value="{{ i }}" name={{ names[loop.index0] }}></td>
+	    {% if names[loop.index0] not in ["name", "order_id", "part_id", "cust_id"] %}
+	    <td><input type=text value={{ i }} name={{ names[loop.index0] }}></td>
 	    {% else %}
-	    <td><input type=text value="{{ i }}" name={{ names[loop.index0] }} readonly></td>
+	    <td>{{ i }}</td>
 	    {% endif %}
           {% endfor %}
           </tr>
       </table>
-      <input type=submit value="Update">
+      <input class="button" style="margin-top: 10px" type=submit value="Update">
+        <form action="{{ url_for('delete', itype=tname, ident=row[0]) }}" method="post">
+          <input class="button" style="margin-left: 20px; margin-top: 10px;" type="submit" value="Delete" />
     </form>
     <form action="{{ url_for('delete', itype=tname, ident=row[0]) }}" method="post">
 	    <input type="submit" value="Delete" />
