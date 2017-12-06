@@ -20,7 +20,7 @@
 			<h3> Please insert the correct information, do not leave any fields blank. </h3>
 			<br><br><br>
 			<form action="{{ url_for(url) }}" method="POST">
-				{% for key, value in content.items() %} {% if key != 'a_date' %} {{ value }}
+				{% for key, value in content.items() %} {% if key != 'a_date' and key != 'date_ordered' %} {{ value }}
 				<br>
 				<input type="text" name={{ key }} placeholder={{ key }} required/>
 				<br> {% else %} {{ value }}

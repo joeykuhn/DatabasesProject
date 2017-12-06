@@ -2,6 +2,7 @@ import sqlite3 as sql
 from flask import Flask, request
 from flask import render_template
 from collections import OrderedDict
+from itertools import izip as zip
 
 app = Flask(__name__)
 
@@ -26,8 +27,8 @@ def insert(itype):
         content['address'] =  'Address'
         url = 'add_man'
     elif itype == 'order':
+        content['order_id'] = 'Order ID'
         content['pay_info'] = 'Payment Information'
-        content['order_ID'] = 'Order ID'
         content['date_ordered'] = 'Date Ordered'
         content['total_price'] = 'Total Price'
         url = 'add_order'
@@ -43,9 +44,9 @@ def insert(itype):
         url = 'add_cust'
     elif itype == 'op':
         content['part_id']= 'Part ID'
+        content['order_id']= 'Order ID'
         content['quantity']= 'Quantity'
         content['discount']= 'Discount'
-        content['receipt_num']= 'Receipt Number'
         content['retail_price']= 'Retail Price'
         url = 'add_op'
     return render_template('insert.html', content=content, url=url)
@@ -62,19 +63,19 @@ def add_part():
             serial = int(request.form["serial"])
             price = float(request.form["price"])
             mname = request.form["mname"]
+            vals = ("part_id", part_id)
+            check = enforce("part", vals)
+            if check["error"]:
+                return render_template('index.html',msg=check["msg"])
 
             with sql.connect("test3.db") as con:
                 cur = con.cursor()
                 cur.execute("INSERT INTO part (a_date,name,part_id,serial,price) VALUES (?,?,?,?,?)",(a_date,name,part_id,serial,price))
-                cur.execute("INSERT INTO made (name, part_id) VALUES (?,?)", (mname, part_id))
                 con.commit()
-                msg = "Added part successfully"
         except:
             con.rollback()
-            msg = "error in insert operation"
-
         finally:
-            return render_template("result.html", msg = msg)
+            return render_template("index.html", msg = check["msg"])
             con.close()
 
 @app.route('/addman', methods=["POST", "GET"])
@@ -84,6 +85,9 @@ def add_man():
         try:
             name = request.form["name"]
             address = request.form["address"]
+            check = enforce("manufacturer", ("name", name))
+            if check["error"]:
+                return render_template("index.html", msg=check["msg"])
 
             with sql.connect("test3.db") as con:
                 cur = con.cursor()
@@ -95,7 +99,7 @@ def add_man():
             msg = "error in insert operation"
 
         finally:
-            return render_template("result.html", msg = msg)
+            return render_template("index.html", msg = check["msg"])
             con.close()
 
 
@@ -112,6 +116,9 @@ def add_cust():
             stadd = request.form["stadd"]
             _zip_ = request.form["zip"]
             state = request.form["state"]
+            check = enforce("customer", ("cust_id", cust_id))
+            if check["error"]:
+                return render_template("index.html", msg=check["msg"])
 
             with sql.connect("test3.db") as con:
                 cur = con.cursor()
@@ -123,7 +130,7 @@ def add_cust():
             msg = "error in insert operation"
 
         finally:
-            return render_template("result.html", msg = msg)
+            return render_template("index.html", msg = check["msg"])
             con.close()
 
 
@@ -136,18 +143,18 @@ def add_order():
             total_price = request.form["total_price"]
             order_id = request.form["order_id"]
             date_ordered = request.form["date_ordered"]
-                                                                                                                                                                                                                   
+            check = enforce("order", ("order_id", order_id))
+            if check["error"]:
+                return render_template("index.html", msg=check["msg"])
+
             with sql.connect("test3.db") as con:                                                                                                                                                                   
                 cur = con.cursor()                                                                                                                                                                                 
-                cur.execute("INSERT INTO order (pay_info, total_price, order_id, date_ordered) VALUES (?,?,?,?)",(pay_info, total_price, order_id, date_ordered)) 
-                con.commit()                                                                                                                                                                                       
-                msg = "Added order successfully"                                                                         
-        except:                                                                                                                                                                                                    
-            con.rollback()                                                                                                                                                                                         
-            msg = "error in insert operation"                                                                                                                                                                      
-                                                                                                                                                                                                                   
-        finally:                                                                                                                                                                                                   
-            return render_template("result.html", msg = msg)                                                                                                                                                       
+                cur.execute("INSERT INTO 'order' (order_id, pay_info, total_price, date_ordered) VALUES (?,?,?,?)",(order_id, pay_info, total_price, date_ordered)) 
+                con.commit() 
+        except:  
+            con.rollback() 
+        finally: 
+            return render_template("index.html", msg = check["msg"]) 
             con.close()
 
 @app.route('/addop', methods=["POST", "GET"])
@@ -158,19 +165,21 @@ def add_op():
             part_id = request.form["part_id"]
             quantity = request.form["quantity"]
             discount = request.form["discount"]
-            receipt_num = request.form["receipt_num"]
+            order_ID = request.form["order_id"]
             retail_price = request.form["retail_price"]
+            check = enforce("ordered_part", (part_id, order_id))
+            if check["error"]:
+                return render_template("index.html", msg=check["msg"])
+
             with sql.connect("test3.db") as con:
                 cur = con.cursor()
-                cur.execute("INSERT INTO ordered_part (part_id, quantity, discount, receipt_num, retail_price) VALUES (?,?,?,?,?)",(part_id, quantity, discount, receipt_num, retail_price))
+                cur.execute("INSERT INTO ordered_part (part_id, order_id, quantity, discount, retail_price) VALUES (?,?,?,?,?)",(part_id, order_id, quantity, discount, retail_price))
                 con.commit()
-                msg = "Added ordered part successfully"
         except:
             con.rollback()
-            msg = "error in insert operation"
 
         finally:
-            return render_template("result.html", msg = msg)
+            return render_template("index.html", msg = check["msg"])
             con.close()
 
 
@@ -189,14 +198,13 @@ def list(itype='null'):
         rows = cur.fetchall()
     else:
         return render_template('index.html')
-    return render_template("list.html", rows = rows, names = names, tname=itype)
+    return render_template("list.html", names=names, rows=rows, tname=itype)
 
 
 @app.route('/display/<itype>/<ident1>/<ident2>')
 @app.route('/display/<itype>/<ident1>')
 @app.route('/display')
 def display(itype,ident1='Anon',ident2='Anon'):
-    print(itype, ident1, ident2)
     if itype == 'Anon':
         return render_template('index.html')
     primk = {'part': 'part_id',
@@ -207,14 +215,13 @@ def display(itype,ident1='Anon',ident2='Anon'):
     con = sql.connect("test3.db")
     cur = con.cursor()
     if itype == 'op':
-        com = 'SELECT * FROM ordered_part WHERE receipt_num=' + ident1 + ' AND order_id=' + ident2
+        com = 'SELECT * FROM ordered_part WHERE part_id=' + ident1 + ' AND order_id=' + ident2
         cur.execute(com)
-        row = cur.fetchone()
+        row = enumerate(cur.fetchone())
         names = [description[0] for description in cur.description]
         tname = itype
         return render_template('display.html', row = row, names = names, tname=tname)
     com = 'SELECT * FROM ' + itype + ' WHERE ' + primk[itype] + '= \'' + ident1 + '\''
-    print(com)
     cur.execute(com)
     row = cur.fetchone()
     names = [description[0] for description in cur.description]
@@ -247,5 +254,80 @@ def delete(itype, ident):
         msg="something went wrong with the deletion"
         con.rollback()
     finally:
-        return render_template("result.html", msg=msg)
+        return render_template("index.html", msg=msg)
 
+@app.route('/search/<itype>', methods=["GET","POST"])
+def search(itype):
+    if request.method == "POST":
+        with sql.connect("test3.db") as con:
+            cur = con.cursor()
+            con.row_factory = sql.Row
+            com = "SELECT * FROM '" + itype  + "' WHERE " + request.form["selection"] + "=" + request.form["search"]
+            cur.execute(com)
+            rows = cur.fetchall()
+            names = [description[0] for description in cur.description]
+            return render_template("list.html", rows=rows, names=names, tname=itype)
+
+@app.route('/modify/<itype>', methods=["GET","POST"])
+def modify(itype):
+    if request.method == "POST":
+        with sql.connect("test3.db") as con:
+            cur = con.cursor()
+            if itype == "ordered_part":
+                cols = ["quantity", "discount", "retail_price"]
+                vals = [request.form["part_id"], request.form["order_id"]]
+                check = enforce(itype, vals)
+                if check["errors"]:
+                    return render_template("index.html", msg=check["msg"])
+                for i in cols:
+                    cur.execute("UPDATE '{}' SET {}={} WHERE part_id=? AND order_id=?".format(itype, i, request.form[i]), (vals[0], vals[1]))
+                return render_template("index.html", msg=check["msg"])
+            elif itype == "part":
+                cols = ["a_date", "name", "serial", "price"]
+                vals = ["part_id", request.form["part_id"]]
+                check = enforce(itype, vals)
+                for i in cols:
+                    cur.execute("UPDATE '{}' SET {}='{}' WHERE part_id=?".format(itype, i, request.form[i]), (vals[1]))
+                return render_template("index.html", msg=check["msg"])
+             
+            elif itype == "manufacturer":
+                cols = ["address"]
+                vals = ["name", request.form["name"]]
+                check = enforce(itype, vals)
+                for i in cols:
+                    cur.execute("UPDATE '{}' SET {}={} WHERE name=?".format(itype, i, request.form[i]), (vals[1]))
+                return render_template("index.html", msg=check["msg"])
+          
+            elif itype == "order":
+                cols = ["pay_info", "total_price", "date_ordered"]
+                vals = ["order_id", request.form["order_id"]]
+                check = enforce(itype, vals)
+                for i in cols:
+                    cur.execute("UPDATE '{}' SET {}={} WHERE order_id=?".format(itype, i, request.form[i]), (vals[1]))
+                return render_template("index.html", msg=check["msg"])          
+
+            elif itype == "customer":
+                cols = ["fname", "lname", "email", "n/umber", "stadd", "zip", "state"]
+                vals = ["cust_id", request.form["cust_id"]]
+                check = enforce(itype, vals)
+                for i in cols:
+                    cur.execute("UPDATE '{}' SET {}={} WHERE cust_id=?".format(itype, i, request.form[i]), (vals[1]))
+                return render_template("index.html", msg=check["msg"])
+
+
+def enforce(itype, vals):
+    with sql.connect("test3.db") as con:
+        cur = con.cursor()
+        if itype == 'ordered_part':
+            cur.execute('SELECT * FROM ordered_part WHERE part_id=' + vals[0] + "AND order_id=" + vals[1])
+            if cur.fetchone():
+                return {"msg": "Invalid: part_id= " + vals[0] + " and order_id=" + vals[1] + " already exists!",
+                        "error": True}
+        else:
+            cur.execute("SELECT * FROM '{}' WHERE {}=?".format(itype, vals[0]), (vals[1],))
+            if cur.fetchone() is not None:
+                return {'msg': 'Invalid: {}={} already exists!'.format(vals[0], vals[1]),
+                        'error': True}
+            else:
+                return {'msg': 'Successfully completed action.',
+                        'error': False}
