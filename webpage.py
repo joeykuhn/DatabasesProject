@@ -2,7 +2,7 @@ import sqlite3 as sql
 from flask import Flask, request
 from flask import render_template
 from collections import OrderedDict
-from itertools import izip as zip
+#from itertools import izip as zip
 
 app = Flask(__name__)
 
