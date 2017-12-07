@@ -327,12 +327,22 @@ def enforce(itype, vals):
         # have to account for two pk's in ordered_part
         if itype == 'ordered_part':
             cur.execute('SELECT * FROM ordered_part WHERE part_id=? AND order_id=?', (vals[0], vals[1]))
+            print(vals)
             if cur.fetchone():
                 return {"msg": "Invalid: ordered_part with part_id={} and order_id={} already exists!".format(vals[0], vals[1]), 
                         "error": True}
+            cur.execute('SELECT * FROM "order" WHERE order_id=?', (vals[1],))
+            if cur.fetchone():
+                cur.execute("SELECT * FROM part WHERE part_id=?", (vals[0],))
+                if cur.fetchone():
+                    return {"msg": "Successfully completed action",
+                            "error": False}
+                else:
+                    return {"msg": "Invalid: part with part_id={} not found".format(vals[0]),
+                            "error": True}
             else:
-                return {"msg": "Successfully completed action.",
-                        "error": False}
+                return {"msg": "Invalid: order with order_id={} not found".format(vals[1]),
+                        "error": True}
         else:
             cur.execute("SELECT * FROM '{}' WHERE {}=?".format(itype, vals[0]), (vals[1],))
             if cur.fetchone() is not None:
