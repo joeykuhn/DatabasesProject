@@ -253,7 +253,7 @@ def delete(itype, ident, ident2=None):
             elif itype == "manufacturer":
                 cur.execute("DELETE FROM manufacturer WHERE name = ?", (ident,))
             elif itype == "order":
-                cur.execute("DELETE FROM order WHERE order_id = ?", (ident,))
+                cur.execute("DELETE FROM 'order' WHERE order_id = ?", (ident,))
             elif itype == "customer":
                 cur.execute("DELETE FROM customer WHERE cust_ID = ?", (ident,))
             elif itype == "ordered_part":
