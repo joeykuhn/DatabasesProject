@@ -290,12 +290,9 @@ def modify(itype):
             if itype == "ordered_part":
                 cols = ["quantity", "discount", "retail_price"]
                 vals = [request.form["part_id"], request.form["order_id"]]
-                check = enforce(itype, vals)
-                if check["errors"]:
-                    return render_template("index.html", msg=check["msg"])
                 for i in cols:
                     cur.execute("UPDATE '{}' SET {}={} WHERE part_id=? AND order_id=?".format(itype, i, request.form[i]), (vals[0], vals[1]))
-                return render_template("index.html", msg=check["msg"])
+                return render_template("index.html", msg="Successfully changed part!")
             elif itype == "part":
                 cols = ["a_date", "name", "serial", "price"]
                 vals = ["part_id", request.form["part_id"]]
