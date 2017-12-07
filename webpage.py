@@ -317,11 +317,11 @@ def modify(itype):
                 return render_template("index.html", msg="Successfully changed order!")          
 
             elif itype == "customer":
-                cols = ["fname", "lname", "email", "n/umber", "stadd", "zip", "state"]
+                cols = ["fname", "lname", "email", "number", "stadd", "zip", "state"]
                 vals = ["cust_id", request.form["cust_id"]]
                 for i in cols:
                     cur.execute("UPDATE customer SET {}=? WHERE cust_id=?".format(i), (request.form[i], vals[1]))
-                return render_template("index.html", msg=check["msg"])
+                return render_template("index.html", msg="Successfully changed customer!")
 
 
 def enforce(itype, vals):
