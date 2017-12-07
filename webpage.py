@@ -2,7 +2,6 @@ import sqlite3 as sql
 from flask import Flask, request
 from flask import render_template
 from collections import OrderedDict
-from itertools import izip as zip
 
 app = Flask(__name__)
 
@@ -243,6 +242,7 @@ def display(itype,ident1='Anon',ident2='Anon'):
 
 
 @app.route('/delete/<itype>/<ident>/<ident2>', methods = ["GET","POST"])
+@app.route('/delete/<itype>/<ident>', methods=["GET","POST"])
 def delete(itype, ident, ident2=None):
     try:
         with sql.connect("test3.db") as con:
