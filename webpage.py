@@ -2,10 +2,6 @@ import sqlite3 as sql
 from flask import Flask, request
 from flask import render_template
 from collections import OrderedDict
-<<<<<<< HEAD
-#from itertools import izip as zip
-=======
->>>>>>> c53c5cf7fa993f918f256c7406c3b0da5e98718d
 
 app = Flask(__name__)
 
