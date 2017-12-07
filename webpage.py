@@ -253,7 +253,7 @@ def delete(itype, ident, ident2=None):
             elif itype == "manufacturer":
                 cur.execute("DELETE FROM manufacturer WHERE name = ?", (ident,))
             elif itype == "order":
-                cur.execute("DELETE FROM order WHERE order_id = ?", (ident,))
+                cur.execute("DELETE FROM 'order' WHERE order_id = ?", (ident,))
             elif itype == "customer":
                 cur.execute("DELETE FROM customer WHERE cust_ID = ?", (ident,))
             elif itype == "ordered_part":
@@ -317,11 +317,11 @@ def modify(itype):
                 return render_template("index.html", msg="Successfully changed order!")          
 
             elif itype == "customer":
-                cols = ["fname", "lname", "email", "n/umber", "stadd", "zip", "state"]
+                cols = ["fname", "lname", "email", "number", "stadd", "zip", "state"]
                 vals = ["cust_id", request.form["cust_id"]]
                 for i in cols:
                     cur.execute("UPDATE customer SET {}=? WHERE cust_id=?".format(i), (request.form[i], vals[1]))
-                return render_template("index.html", msg=check["msg"])
+                return render_template("index.html", msg="Successfully changed customer!")
 
 
 def enforce(itype, vals):
